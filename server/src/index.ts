@@ -1,4 +1,4 @@
-import http from "http";
+import * as http from "http";
 import { connection, server } from "websocket";
 
 const httpServer : http.Server = http.createServer((req, res) => {
@@ -7,10 +7,10 @@ const httpServer : http.Server = http.createServer((req, res) => {
 });
 httpServer.listen(8000, () => console.log("Server initiated and is listening on port 8000"));
 
-const wsServeer : server = new server({ httpServer, autoAcceptConnections: true });
+const wsServer : server = new server({ httpServer, autoAcceptConnections: false });
 
-wsServeer.on('request', (req) => {
-    const connection: connection = req.accept('shooting-gallery', req.origin);
+wsServer.on('request', (req) => {
+    const connection: connection = req.accept('', req.origin);
     console.log((new Date()) + ': Connection accepted.');
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
