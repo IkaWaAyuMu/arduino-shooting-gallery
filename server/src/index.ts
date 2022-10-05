@@ -41,6 +41,7 @@ wsServer.on('request', (req) => {
     //Update from TARGET
     connection.on('message', (message) => {
         if (!targetClients.includes(connection)) return;
+        console.log(`${new Date()} + Recieve target (${connection.remoteAddress}) message : ${(message.type === "utf8" ? message.utf8Data : "NOT_UTF8")}`)
 
         // Update score to web
         if (message.type === "utf8" && message.utf8Data === "SCORE") {
@@ -52,6 +53,7 @@ wsServer.on('request', (req) => {
     //Update from WEB
     connection.on('message', (message) => {
         if (!webClients.includes(connection)) return;
+        console.log(`${new Date()} + Recieve web (${connection.remoteAddress}) message : ${(message.type === "utf8" ? message.utf8Data : "NOT_UTF8")}`)
         // Message sequence to target.
         if (message.type === "utf8" && message.utf8Data === "START") targetClients.forEach(client => { client.send("START"); });
         else if (message.type === "utf8" && message.utf8Data === "STOP") targetClients.forEach(client => { client.send("STOP"); });
