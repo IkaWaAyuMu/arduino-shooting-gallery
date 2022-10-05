@@ -54,7 +54,7 @@ wsServer.on("request", (req) => {
   connection.on("message", (message) => {
     if (!targetClients.includes(connection)) return;
     console.log(
-      `${new Date()} + Recieve target (${connection.remoteAddress}) message : ${
+      `${new Date()}: Recieve target (${connection.remoteAddress}) message : ${
         message.type === "utf8" ? message.utf8Data : "NOT_UTF8"
       }`
     );
@@ -72,7 +72,7 @@ wsServer.on("request", (req) => {
   connection.on("message", (message) => {
     if (!webClients.includes(connection)) return;
     console.log(
-      `${new Date()} + Recieve web (${connection.remoteAddress}) message : ${
+      `${new Date()}: Recieve web (${connection.remoteAddress}) message : ${
         message.type === "utf8" ? message.utf8Data : "NOT_UTF8"
       }`
     );
@@ -93,7 +93,7 @@ wsServer.on("request", (req) => {
         client !== connection;
       });
       console.log(
-        `${new Date()} + Target (${
+        `${new Date()}: Target (${
           connection.remoteAddress
         }) closed the connection. ${reason}: ${description}`
       );
@@ -102,7 +102,7 @@ wsServer.on("request", (req) => {
         client !== connection;
       });
       console.log(
-        `${new Date()} + Gun (${
+        `${new Date()}: Gun (${
           connection.remoteAddress
         }) closed the connection. ${reason}: ${description}`
       );
@@ -111,13 +111,13 @@ wsServer.on("request", (req) => {
         client !== connection;
       });
       console.log(
-        `${new Date()} + Web (${
+        `${new Date()}: Web (${
           connection.remoteAddress
         }) closed the connection. ${reason}: ${description}`
       );
     } else
       console.log(
-        `${new Date()} + Undefined client (${
+        `${new Date()}: Undefined client (${
           connection.remoteAddress
         }) closed the connection. ${reason}: ${description}`
       );
