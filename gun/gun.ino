@@ -58,7 +58,7 @@ void loop() {
     if (!digitalRead(FIRE_BUTTON)) {
       if (((!ISAUTO && !isFireHold) || ISAUTO) && fireDelay <= 0 && ammo > 0) {
         Serial.println("FIRE");
-        IrSender.sendNEC(0x0001, 0x01, 0);
+        IrSender.sendNEC(0x0690, 0x42, 0);
         ammo--;
         fireDelay = FIRE_RATE;
         visualDelay = VISUAL_DELAY;
