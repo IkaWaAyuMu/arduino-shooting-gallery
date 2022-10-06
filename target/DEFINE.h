@@ -6,5 +6,8 @@
   #define PORT 8000
   
   #define RECIEVER_PIN D5
-  #define SERVO_PIN D6
+  #define LED_R_PIN D6
+  #define LED_G_PIN D7
+  #define LED_B_PIN D8
+
 #endif
