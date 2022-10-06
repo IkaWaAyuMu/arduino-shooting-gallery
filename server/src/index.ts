@@ -63,8 +63,8 @@ wsServer.on("request", (req) => {
     // Update score to web
     if (message.type === "utf8" && message.utf8Data === "SCORE") {
       score++;
-      webClients.forEach((client) => {
-        console.log(`${new Date()}: Sent to web (${client.remoteAddress}) message : ${JSON.stringify({ score })}`)
+      webClients.forEach((client, i) => {
+        console.log(`${new Date()}: Sent to web ${i} (${client.remoteAddress}) message : ${JSON.stringify({ score })}`)
         client.send(JSON.stringify({ score }));
       });
     }
@@ -85,8 +85,8 @@ wsServer.on("request", (req) => {
     }
     else if (message.type === "utf8" && message.utf8Data === "STOP") {
       isStart = false;
-      targetClients.forEach((client) => {
-        console.log(`${new Date()}: Sent to target (${client.remoteAddress}) message : DOWN`)
+      targetClients.forEach((client, i) => {
+        console.log(`${new Date()}: Sent to target ${i} (${client.remoteAddress}) message : DOWN`)
         client.send("DOWN");
       });
     }
@@ -132,12 +132,17 @@ wsServer.on("request", (req) => {
 
 while (true){
   await sleep(100);
+  if (isStart) {
+    console.log(targetClients.length);
+    targetClients[Math.floor(Math.random() * targetClients.length-1)].send("UP");
+  }
   while(isStart) {
-    console.log("A");
-    targetClients.forEach((client) => {
-      console.log(`${new Date()}: Sent to target (${client.remoteAddress}) message : UP`);
-      client.send("UP");
+    targetClients.forEach((client, i) => {
+      if (Math.random() > 0.8) {
+        console.log(`${new Date()}: Sent to target ${i} (${client.remoteAddress}) message : UP`);
+        client.send("UP");
+      }
     });
-    await sleep(100);
+    await sleep(750);
   }
 }
