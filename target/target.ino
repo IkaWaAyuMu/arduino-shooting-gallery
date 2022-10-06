@@ -1,7 +1,6 @@
 #include <IRremote.hpp>
 #include <ArduinoWebsockets.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266TimerInterrupt.h>
 #include <Servo.h>
 #include "DEFINE.h"
 
@@ -10,8 +9,6 @@ using namespace websockets;
 WebsocketsClient client;
 
 Servo servo;
-
-ESP8266Timer ITimer;
 // ------------------------------------------------------------------
 void UpdateFrame();
 // ------------------------------------------------------------------
@@ -47,17 +44,16 @@ void setup() {
     else if (data == "UP") { isUp = true; }
     else if (data == "DOWN") { isUp = false; }
   });
-
-  client.onClose()
 }
 
 void loop() {
   if(client.available()) {
     client.poll();
   }
+  Serial.println(isBegin);
   if (isUp) {
-    if (!isBegin) { IrReceiver.begin(RECIEVER_PIN, false); isBegin = true;}
-    servo.write(90);
+    if (!isBegin) { delay(200); IrReceiver.begin(RECIEVER_PIN, false); isBegin = true; }
+    
     if (isBegin && IrReceiver.decode()) {
       IrReceiver.printIRResultShort(&Serial);
       if (IrReceiver.decodedIRData.protocol == NEC && IrReceiver.decodedIRData.address == 0x0690 && IrReceiver.decodedIRData.command == 0x42) {
@@ -67,8 +63,8 @@ void loop() {
       else IrReceiver.resume();
     }
   }
-  else {
-    if (isBegin) { IrReceiver.stop(); isBegin = false; }
-    servo.write(0);
+  else if (!isUp) {
+    if (isBegin) { IrReceiver.stop(); isBegin = false;}
   }
+  delay(50);
 }
