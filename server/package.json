@@ -1,11 +1,12 @@
 {
     "name": "server",
+    "type": "module",
     "version": "1.0.0",
     "description": "",
     "main": "index.ts",
     "scripts": {
-        "compile": "pnpm tsc .\\src\\index.ts --outDir .\\dist\\",
-        "dev": "pnpm tsc .\\src\\index.ts --outDir .\\dist\\ && node .\\dist\\index.js",
+        "compile": "pnpm tsc --outDir .\\dist\\",
+        "dev": "pnpm tsc --outDir .\\dist\\ && node .\\dist\\index.js",
         "start": "node .\\dist\\index.js"
     },
     "author": "",
