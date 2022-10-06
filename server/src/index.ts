@@ -134,7 +134,7 @@ while (true){
   await sleep(100);
   if (isStart) {
     console.log(targetClients.length);
-    targetClients[Math.floor(Math.random() * targetClients.length-1)].send("UP");
+    targetClients[Math.floor(Math.random() * (targetClients.length-1))].send("UP");
   }
   while(isStart) {
     targetClients.forEach((client, i) => {
