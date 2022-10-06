@@ -2,6 +2,7 @@ import * as http from "http";
 import { connection, server } from "websocket";
 // Game setup
 let score: number = 0;
+let isStart: boolean = false;
 
 // server setup
 function sleep(ms: number) {
@@ -63,6 +64,7 @@ wsServer.on("request", (req) => {
     if (message.type === "utf8" && message.utf8Data === "SCORE") {
       score++;
       webClients.forEach((client) => {
+        console.log(`${new Date()}: Sent to web (${client.remoteAddress}) message : ${JSON.stringify({ score })}`)
         client.send(JSON.stringify({ score }));
       });
     }
@@ -77,14 +79,18 @@ wsServer.on("request", (req) => {
       }`
     );
     // Message sequence to target.
-    if (message.type === "utf8" && message.utf8Data === "START")
+    if (message.type === "utf8" && message.utf8Data === "START") {
+      score = 0;
+      isStart = true;
+    }
+    else if (message.type === "utf8" && message.utf8Data === "STOP") {
+      isStart = false;
       targetClients.forEach((client) => {
-        client.send("START");
+        console.log(`${new Date()}: Sent to target (${client.remoteAddress}) message : DOWN`)
+        client.send("DOWN");
       });
-    else if (message.type === "utf8" && message.utf8Data === "STOP")
-      targetClients.forEach((client) => {
-        client.send("STOP");
-      });
+    }
+      
   });
 
   connection.on("close", (reason, description) => {
@@ -123,3 +129,15 @@ wsServer.on("request", (req) => {
       );
   });
 });
+
+while (true){
+  await sleep(100);
+  while(isStart) {
+    console.log("A");
+    targetClients.forEach((client) => {
+      console.log(`${new Date()}: Sent to target (${client.remoteAddress}) message : UP`);
+      client.send("UP");
+    });
+    await sleep(100);
+  }
+}
