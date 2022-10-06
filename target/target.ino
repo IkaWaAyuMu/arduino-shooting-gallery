@@ -1,8 +1,9 @@
+#define DECODE_NEC
+
 #include <IRremote.hpp>
 #include <ArduinoWebsockets.h>
 #include <ESP8266WiFi.h>
 #include "DEFINE.h"
-
 // ------------------------------------------------------------------
 using namespace websockets;
 WebsocketsClient client;
@@ -15,12 +16,14 @@ bool isBegin = false;
 // ------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
+    
+  IrReceiver.begin(RECIEVER_PIN, ENABLE_LED_FEEDBACK);
 
   pinMode(LED_R_PIN, OUTPUT);
   pinMode(LED_G_PIN, OUTPUT);
   pinMode(LED_B_PIN, OUTPUT);
-  LEDSetColor(255,0,0);
-
+  LEDSetColor(true, false, false);
+  
   // Connections
   WiFi.begin(SSID, PSWD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -33,46 +36,43 @@ void setup() {
   }
   Serial.println();
   Serial.println("CONNECTED");
-  LEDSetColor(128,128,255);
-  delay(500);
 
   client.onMessage([&](WebsocketsMessage message) {
     Serial.print("Message recieved: ");
     String data = message.data();
-    Serial.println(data);    
+    Serial.println(data);
 
-    if (data == "TYPE") client.send("TARGET"); 
+    if (data == "TYPE") client.send("TARGET");
 
     else if (data == "UP") { isUp = true; }
     else if (data == "DOWN") { isUp = false; }
   });
+  LEDSetColor(false,false,true);
+  delay(500);  
 }
 
 void loop() {
   if(client.available()) {
     client.poll();
   }
-  Serial.println(isBegin);
-  if (isUp) {
-    if (!isBegin) { IrReceiver.begin(RECIEVER_PIN, false); isBegin = true; LEDSetColor(0,255,0); }
-    
-    if (isBegin && IrReceiver.decode()) {
+  if (isUp) LEDSetColor(false,true,false);
+  else LEDSetColor(false,false,false);
+
+  if (IrReceiver.decode()) {
       IrReceiver.printIRResultShort(&Serial);
-      if (IrReceiver.decodedIRData.protocol == NEC && IrReceiver.decodedIRData.address == 0x0690 && IrReceiver.decodedIRData.command == 0x42) {
+      if (isUp && IrReceiver.decodedIRData.protocol == NEC && IrReceiver.decodedIRData.command == 0x42) {
         Serial.println("Scored");
         client.send("SCORE");
+        isUp = false;
+        IrReceiver.resume();
       }
       else IrReceiver.resume();
-    }
-  }
-  else if (!isUp) {
-    if (isBegin) { IrReceiver.stop(); LEDSetColor(0,0,0); isBegin = false;}
   }
   delay(50);
 }
 
-void LEDSetColor(int rValue, int gValue, int bValue) {
-  analogWrite(LED_R_PIN, rValue);
-  analogWrite(LED_G_PIN, gValue);
-  analogWrite(LED_B_PIN, bValue);
+void LEDSetColor(bool isROn,bool isGOn,bool isBOn) {
+  digitalWrite(LED_R_PIN, !isROn);
+  digitalWrite(LED_G_PIN, !isGOn);
+  digitalWrite(LED_B_PIN, !isBOn);
 }
